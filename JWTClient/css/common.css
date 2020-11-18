@@ -1,0 +1,14 @@
+.container {
+    width: 1024px;
+    margin: 0 auto 0 auto;
+}
+
+.login-form-container, .register-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 70vh;
+}
+
+
