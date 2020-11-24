@@ -30,13 +30,18 @@ if(isset($_POST['email'], $_POST['password'])) {
     try {
         //Execute the query
         $stm->execute();
-
+        
         if($stm->fetchColumn() == 1) {
+            $stm->closeCursor();
+
+            //Get id of the user
+            $id = getUserId($conn, $email, $password);
+
             //Store success in session array
             $_SESSION['success'] = "Login successful welcome";
 
             //Store user information in the session
-            $_SESSION['user'] = array("email" => $email, "password" => $password);
+            $_SESSION['user'] = array("email" => $email, "password" => $password, "id" => $id);
 
             //Redirect the user back with success message
             header("Location: ../../controller/index.php?action=home");
@@ -50,7 +55,7 @@ if(isset($_POST['email'], $_POST['password'])) {
         }
     } catch(PDOException $ex) {
         //Store error in session array
-        $_SESSION['error'] = "Internal Server Error, Return at a later date";
+        $_SESSION['error'] = "Internal Server Error, Return at a later date" . $ex->getMessage();
 
         //Redirect the user back with errors
         header("Location: ../../controller/index.php");
@@ -63,4 +68,19 @@ else {
     
     //Redirect the user back with errors
     header("Location: ../../controller/index.php");
+}
+
+function getUserId($conn, $email, $password) {
+    $query = "SELECT id FROM users WHERE email = :email AND password = :password;";
+
+    $stm = $conn->prepare($query);
+    
+    $stm->bindValue(":email", $email);
+    $stm->bindValue(":password", $password);
+    
+    $stm->execute();
+    
+    $data = $stm->fetchColumn();
+
+    return $data;
 }

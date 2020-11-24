@@ -1,8 +1,16 @@
-.container {
-    width: 1024px;
-    margin: 0 auto 0 auto;
+/* apply a natural box layout model to all elements, but allowing components to change */
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
 }
 
+body {
+    font-size: 100%;
+}
+
+/* Login & Registration Form Page Styles */
 .login-form-container, .register-form-container {
     display: flex;
     justify-content: center;
@@ -11,4 +19,98 @@
     height: 70vh;
 }
 
+.login-form-container form, .register-form-container form {
+    display: flex;
+    flex-direction: column;
+}
 
+.login-form-container form div, .register-form-container form div {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.login-form-container form div:last-child, .register-form-container form div:last-child {
+    margin: 15px 0 10px 0;
+}
+
+.login-form-container > div > a, .register-form-container > div > a {
+    font-size: 110%;
+    color: red;
+    text-decoration: none;
+    padding: 5px;
+}
+/* END */
+
+/* Alert message styles */
+.alert-message {
+    text-align: center;
+    font-size: 110%;
+    color: red;
+}
+
+/* END */
+
+
+/* Navigation bar styles */
+nav > ul {
+    display: flex;
+    list-style-type: none;
+    padding-inline-start: 0;
+    justify-content: space-around;
+}
+nav > ul li {
+    text-align: center;
+    flex-basis: 33.3%;
+}
+
+nav > ul li a {
+    text-decoration: none;
+    color: red;
+    font-size: 120%;
+}
+/* END */
+
+
+/* Home Page styles */ 
+.request-api-key-container {
+    margin-top: 100px;
+}
+.request-api-key-container > header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+
+/* END */
+
+/* Container Breaking Points */
+@media (min-width: 576px) { 
+    .container {
+        width: 100%;
+    }
+}
+
+@media (min-width: 768px) { 
+    .container {
+        width: 768px;
+        margin: 0 auto 0 auto;
+    }
+}
+
+@media (min-width: 992px) { 
+    .container {
+        width: 992px;
+        margin: 0 auto 0 auto;
+    }
+}
+
+@media (min-width: 1200px) { 
+    .container {
+        width: 1024px;
+        margin: 0 auto 0 auto;
+    }
+}
+
+
+/* END */

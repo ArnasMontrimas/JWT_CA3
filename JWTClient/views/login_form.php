@@ -3,12 +3,12 @@
         <div class="container">
             <div class="login-form-container">
                 <header>
-                    <h1>Login Form</h1>
+                    <h1>Welcome Please Login</h1>
                     <!-- 
                         Display any present errors
                     -->
                     <?php if(isset($_SESSION['error'])) { ?> 
-                        <div>
+                        <div class="alert-message">
                             <h4><?php echo $_SESSION['error'] ?></h4>
                         </div>
                         <!-- 
@@ -18,13 +18,17 @@
                     <?php }; ?>
                 </header>
                 <form action="../model/user/login.php" method="POST">
-                    <label for="email">Email</label>
-                    <input type="email" name="email" id="email" reqiured>
-                    <br>
-                    <label for="password">Password</label>
-                    <input type="password" name="password" id="password" required>
-                    <br>
-                    <input type="submit" value="Login">
+                    <div>
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" reqiured>
+                    </div>
+                    <div>
+                        <label for="password">Password</label>
+                        <input type="password" name="password" id="password" required>
+                    </div>
+                    <div>
+                        <input type="submit" value="Login">
+                    </div>
                 </form>
                 <div><!-- Wrapper Div -->
                     <a href="index.php?action=register_form">Register here</a>
