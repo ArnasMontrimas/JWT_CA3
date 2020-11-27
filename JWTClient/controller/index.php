@@ -3,6 +3,9 @@
 //Reqiure the Database class
 require_once "../model/database.php";
 
+//Reqiure a helper function
+require_once "../model/helpers/getApiKey.php";
+
 //Check if the "$action" variable is set if not set to null
 $action = isset($_GET['action']) ? $action = filter_input(INPUT_GET, "action", FILTER_SANITIZE_STRING) : $action = null;
 
@@ -50,6 +53,16 @@ if(isset($_SESSION['user'])) {
                 
             }
             break;
+        case "service1":
+            require_once "../views/head.html";
+            require_once "../views/service1.php";
+            require_once "../views/footer.html";
+            break;
+        case "execute_service1": 
+            /**
+             * You need to curl to your JWTServer do all validation on server then execute function on server and return a response
+             */
+            break;
         case "logout":
             session_unset();
             session_destroy();
@@ -75,17 +88,4 @@ else {
             require_once "../views/login_form.php";
             require_once "../views/footer.html";
     }    
-}
-
-//Helper function
-function getApiKey($url, $payload) {
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-
-    $response = curl_exec($ch);
-    curl_close($ch);
-
-    return $response;
 }

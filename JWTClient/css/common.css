@@ -55,8 +55,6 @@ body {
 /* Navigation bar styles */
 nav > ul {
     display: flex;
-    list-style-type: none;
-    padding-inline-start: 0;
     justify-content: space-around;
 }
 nav > ul li {
@@ -68,6 +66,31 @@ nav > ul li a {
     text-decoration: none;
     color: red;
     font-size: 120%;
+}
+ul {
+    list-style-type: none;
+    padding-inline-start: 0;
+}
+.dropdown-parent {
+    position: relative;
+}
+/* TODO Make the dropdown menu look nice bro showing/hiding sorted */
+.dropdown-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 15px;
+    padding-top: 10px;
+    width: fit-content;
+    margin-top: 44px;
+    margin: 0 auto;
+    display: none;
+}
+.dropdown-toggle:hover + .dropdown-menu, .dropdown-menu:hover {
+    display: block;
+}
+.dropdown-toggle {
+    width: fit-content;
 }
 /* END */
 

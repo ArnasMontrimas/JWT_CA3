@@ -35,14 +35,14 @@ if(isset($_POST['email'], $_POST['password'])) {
             $stm->closeCursor();
 
             //Get id of the user
-            $id = getUserId($conn, $email, $password);
+            $data = getUserIdAndType($conn, $email, $password);
 
             //Store success in session array
             $_SESSION['success'] = "Login successful welcome";
 
             //Store user information in the session
-            $_SESSION['user'] = array("email" => $email, "password" => $password, "id" => $id);
-
+            $_SESSION['user'] = array("email" => $email, "password" => $password, "id" => $data['id'], "type" => $data['membership']);
+            //TODO Function here to check if api_key is set in the database if set then set the session api_key
             //Redirect the user back with success message
             header("Location: ../../controller/index.php?action=home");
         }
@@ -70,8 +70,8 @@ else {
     header("Location: ../../controller/index.php");
 }
 
-function getUserId($conn, $email, $password) {
-    $query = "SELECT id FROM users WHERE email = :email AND password = :password;";
+function getUserIdAndType($conn, $email, $password) {
+    $query = "SELECT id, membership FROM users WHERE email = :email AND password = :password;";
 
     $stm = $conn->prepare($query);
     
@@ -80,7 +80,7 @@ function getUserId($conn, $email, $password) {
     
     $stm->execute();
     
-    $data = $stm->fetchColumn();
+    $data = $stm->fetch(PDO::FETCH_ASSOC);
 
     return $data;
 }

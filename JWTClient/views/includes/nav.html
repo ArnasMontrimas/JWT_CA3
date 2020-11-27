@@ -2,10 +2,14 @@
     <nav>
         <ul>
             <li>
-                <a href="#">Home</a>
+                <a href="index.php?action=home">Home</a>
             </li>
-            <li>
-                <a href="#">Services</a>
+            <li class="dropdown-parent">
+                <a class="dropdown-toggle" href="#">Services</a>
+                <ul class="dropdown-menu">
+                    <li><a href="index.php?action=service1">Service1</a></li>
+                    <li><a href="#">Service2</a></li>
+                </ul>
             </li>
             <li>
                 <a href="index.php?action=logout">Logout</a>
