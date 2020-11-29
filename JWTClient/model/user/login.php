@@ -6,6 +6,11 @@ session_start();
 //Include the databse
 require_once "../database.php";
 
+//Include external functions
+require_once "getUserIdAndType.php";
+require_once "getUserApiKey.php";
+
+
 //Check if all required information has been sent
 if(isset($_POST['email'], $_POST['password'])) {
     //Set up database connection
@@ -42,7 +47,10 @@ if(isset($_POST['email'], $_POST['password'])) {
 
             //Store user information in the session
             $_SESSION['user'] = array("email" => $email, "password" => $password, "id" => $data['id'], "type" => $data['membership']);
-            //TODO Function here to check if api_key is set in the database if set then set the session api_key
+            
+            //Store api_key in SESSION variable if present
+            $_SESSION['api_key'] = getUserApiKey($conn, $data['id']);
+
             //Redirect the user back with success message
             header("Location: ../../controller/index.php?action=home");
         }
@@ -68,19 +76,4 @@ else {
     
     //Redirect the user back with errors
     header("Location: ../../controller/index.php");
-}
-
-function getUserIdAndType($conn, $email, $password) {
-    $query = "SELECT id, membership FROM users WHERE email = :email AND password = :password;";
-
-    $stm = $conn->prepare($query);
-    
-    $stm->bindValue(":email", $email);
-    $stm->bindValue(":password", $password);
-    
-    $stm->execute();
-    
-    $data = $stm->fetch(PDO::FETCH_ASSOC);
-
-    return $data;
 }

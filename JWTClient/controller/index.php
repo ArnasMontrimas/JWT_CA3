@@ -6,6 +6,14 @@ require_once "../model/database.php";
 //Reqiure a helper function
 require_once "../model/helpers/getApiKey.php";
 
+//Require external function
+require_once "../model/user/setUserApiKey.php";
+require_once "../model/user/updateUserType.php";
+
+//Helper function
+require_once "../model/helpers/service1CurlRequest.php";
+
+
 //Check if the "$action" variable is set if not set to null
 $action = isset($_GET['action']) ? $action = filter_input(INPUT_GET, "action", FILTER_SANITIZE_STRING) : $action = null;
 
@@ -38,12 +46,25 @@ if(isset($_SESSION['user'])) {
                 );
                 
                 $api_key = getApiKey($url, $data);
+                
+                $api_key = json_decode($api_key);
 
                 if(!empty($api_key)) {
                     $_SESSION['api_key'] = $api_key;
                     $_SESSION['success'] = "Api key set";
-                    //TODO: Set the api_key column for that particular user who requested the api key bro!
-                    header("Location: index.php?action=home");
+
+                    $db = new Database();
+                    $conn = $db->connect();
+
+                    if(setUserApiKey($api_key, $conn, $_SESSION['user']['id'])) { 
+                        if(updateUserType($_SESSION['user']['id'], $conn)) {
+                            $_SESSION['user']['type'] = "premium";
+                            header("Location: index.php?action=home");
+                        }
+                        else {
+                            header("Location: index.php?action=-1"); 
+                        }
+                    } else header("Location: index.php?action=-1");
                 }
                 else {
                     $_SESSION['api_key'] = $api_key;
@@ -52,6 +73,7 @@ if(isset($_SESSION['user'])) {
                 }
                 
             }
+            else header("Location: index.php?action=-1");
             break;
         case "service1":
             require_once "../views/head.html";
@@ -59,16 +81,26 @@ if(isset($_SESSION['user'])) {
             require_once "../views/footer.html";
             break;
         case "execute_service1": 
-            /**
-             * You need to curl to your JWTServer do all validation on server then execute function on server and return a response
-             */
+            if(isset($_SESSION['api_key'])) {
+                $url = "localhost/JWT_CA3/JWTServer/index.php?action=service1";
+
+                $data = array(
+                    "api_key" => $_SESSION['api_key']
+                );
+
+                $response = service1CurlRequest($url, $data);
+                //Type cast php object to array
+                (array) $response = json_decode($response);
+                
+                print_r($response);
+            }
             break;
         case "logout":
             session_unset();
             session_destroy();
             header("Location: index.php");
         default:
-            //TODO ADD A 404 ERROR PAGE TO BE DISPLAYED WHEN ACTION IS INVALID
+            //TODO Some examples 404 - NotFound, SomeotherCode - Bad Request, and Bad page blablalbla
             echo "<h1>404 NOT FOUND</h1>";
     }
 

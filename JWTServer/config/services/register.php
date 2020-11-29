@@ -14,7 +14,6 @@ function registerUser(int $id, String $password, String $type, PDO $conn) :bool 
         $statement->execute();
     } catch(PDOException $ex) {
         return false;
-        die();
     }
 
     if($statement->rowCount() === 1) return true;

@@ -5,6 +5,7 @@ session_start();
 
 //Include the databse & function to check if provided email is unique
 require_once "../database.php";
+
 require_once "checkIfEmailUnique.php";
 
 //Check if all required information has been sent

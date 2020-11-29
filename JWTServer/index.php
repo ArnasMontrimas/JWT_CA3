@@ -7,6 +7,11 @@ require_once "config/services/register.php";
 //JWT helper class
 require_once "JWT_class.php";
 
+//Helper function
+require_once "config/services/checkUserType.php";
+require_once "config/services/checkIfUserExists.php";
+require_once "config/services/updateUserType.php";
+
 $secret = "asdhag2ygd17dgagsdxzg8721gxzig";
 
 
@@ -25,9 +30,6 @@ switch($action) {
             //Extract variables from array
             extract($_POST);
             
-            //Register user on the server
-            //TODO::Register User on the server!
-
             //Set up token
             $token = array();
 
@@ -36,19 +38,84 @@ switch($action) {
             $token['id'] = $id;
             $token['password'] = $password;
             $token['type'] = $membership;
+            
             $jwt = JWT::encode($token, $secret);
             
-            $result = registerUser($id, $password, $membership, $conn);
-
-            if($result) echo $jwt;
+            if($membership == "free") {
+                $result = registerUser($id, $password, $membership, $conn);
+            }
+            if($membership == "premium") {
+                if(checkIfUserExists($id, $conn)) {
+                    if(checkUserType($id, $conn) == "premium") {
+                         $result = false;
+                    }
+                    else {
+                        if(updateUserType($id, $conn)) $result = true;
+                        else $result = false;
+                    }
+                }
+                else {
+                    $result = registerUser($id, $password, $membership, $conn);
+                }
+            }
+            
+            if($result) echo JWT::jsonEncode($jwt);
             else echo null;
         }
         else {
-            echo "Data was not set";
+            echo json_encode("Data was not set");
         }
         break;
     case "service1":
-        //HERE YOU DO VALIDATION OF JWT CHECK THE USAGE AND ALL THAT EXECUTE SERVICE RETURN RESPONSE
+        //First check if the api_key was sent with the request
+        if(isset($_POST['api_key'])) {
+            $api_key = $_POST['api_key'];
+
+            //Set a default value incase decoding fails
+            $token = " Server Error Occurred";
+
+            //Extract information stored in the key
+            try {
+                $token = JWT::decode($api_key, $secret);
+            } catch(UnexpectedValueException $ex) {
+                echo "Token is invalid";
+            } catch(DomainException $ex) {
+                echo "Empty Algorithm";
+            }
+            
+            //Type cast object to array
+            $token = (array) $token;
+
+            //Assing user data to separate variables
+            $user_id = $token['id'];
+            $password = $token['password'];
+            $type = $token['type'];
+            $created = $token['created'];
+
+            //Check if the user exists in the servers database
+            if(checkIfUserExists($user_id, $type)) {
+                //Check what type the user is this will determine wether i have to limit his access to the service
+                if($type === "free") {
+                    //First check if 24 hours have passed since token creation
+                    if($created - time() > (24 * 60 * 60)) {
+                        //Reset the usage number
+                    }
+                    else {
+                        //Now check if the usage is not equal to 10
+
+                    }
+                }
+                else {
+                    //TODO:: HERE YOU WILL NEED TO CHECK IF HE IS PAID UP TO DATE
+                }
+            }
+            else {
+                echo "You are not authorized to use this service";
+            }
+        }
+        else {
+            echo "You are not authorized to use this service";
+        }
         break;
         /*
             ************************************** MAKE SURE TO REUSE YOUR SOAP FUNCTIONS THIS WILL MAKE YOUR LIFE ALOT EASIER BRO ******************************************
