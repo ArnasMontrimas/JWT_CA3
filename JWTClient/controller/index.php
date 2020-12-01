@@ -3,16 +3,20 @@
 //Reqiure the Database class
 require_once "../model/database.php";
 
-//Reqiure a helper function
-require_once "../model/helpers/getApiKey.php";
+//Reqiure a CURL request function
+require_once "../model/curl/getApiKey.php";
+require_once "../model/curl/sendServiceRequest.php";
 
-//Require external function
-require_once "../model/user/setUserApiKey.php";
-require_once "../model/user/updateUserType.php";
+//Require functions (Tese functions will make my code in index.php shorter)
+require_once "../model/functions/setUserKeyAndType.php";
 
-//Helper function
-require_once "../model/helpers/service1CurlRequest.php";
+//Require User class
+require_once "../model/user/user.php";
 
+
+//Set up database connection
+$db = new Database();
+$conn = $db->connect();
 
 //Check if the "$action" variable is set if not set to null
 $action = isset($_GET['action']) ? $action = filter_input(INPUT_GET, "action", FILTER_SANITIZE_STRING) : $action = null;
@@ -39,41 +43,36 @@ if(isset($_SESSION['user'])) {
             if(isset($_POST['membership'])) {
                 $url = "localhost/JWT_CA3/JWTServer/index.php?action=generate_key";
 
+                $membership = filter_input(INPUT_POST, "membership", FILTER_SANITIZE_STRING);
+
                 $data = array(
-                    "password" => password_hash($_SESSION['user']['password'], PASSWORD_DEFAULT),
+                    "password" => $_SESSION['user']['password'],
                     "id" => $_SESSION['user']['id'],
-                    "membership" => filter_input(INPUT_POST, "membership", FILTER_SANITIZE_STRING),
+                    "membership" => $membership
                 );
                 
                 $api_key = getApiKey($url, $data);
-                
                 $api_key = json_decode($api_key);
 
-                if(!empty($api_key)) {
-                    $_SESSION['api_key'] = $api_key;
-                    $_SESSION['success'] = "Api key set";
-
-                    $db = new Database();
-                    $conn = $db->connect();
-
-                    if(setUserApiKey($api_key, $conn, $_SESSION['user']['id'])) { 
-                        if(updateUserType($_SESSION['user']['id'], $conn)) {
-                            $_SESSION['user']['type'] = "premium";
-                            header("Location: index.php?action=home");
-                        }
-                        else {
-                            header("Location: index.php?action=-1"); 
-                        }
-                    } else header("Location: index.php?action=-1");
+                if(isset($api_key)) {
+                    if(setUserKeyAndType($api_key, $membership, User::class, $conn)) {
+                        header("Location: index.php?action=home");
+                    }
+                    else {
+                        $_SESSION['error'] = "Key and membership could not be set";
+                        header("Location: index.php?action=home");
+                    }
                 }
                 else {
-                    $_SESSION['api_key'] = $api_key;
-                    $_SESSION['error'] = "Api key could not be set";
+                    $_SESSION['error'] = "Key could not be retrievied";
                     header("Location: index.php?action=home");
                 }
                 
             }
-            else header("Location: index.php?action=-1");
+            else {
+                $_SESSION['error'] = "You must choose a membership type";
+                header("Location: index.php?action=home");
+            }
             break;
         case "service1":
             require_once "../views/head.html";
@@ -83,22 +82,133 @@ if(isset($_SESSION['user'])) {
         case "execute_service1": 
             if(isset($_SESSION['api_key'])) {
                 $url = "localhost/JWT_CA3/JWTServer/index.php?action=service1";
+                
+                $result = array(
+                    "games" => null,
+                    "message" => null    
+                );
 
                 $data = array(
                     "api_key" => $_SESSION['api_key']
                 );
 
-                $response = service1CurlRequest($url, $data);
-                //Type cast php object to array
-                (array) $response = json_decode($response);
-                
-                print_r($response);
+                $response = sendServiceRequest($url, $data);
+                $response = json_decode($response, true);
+                  
+                if(isset($response['api_key'])) {
+                     User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
+                     $_SESSION['api_key'] = $response['api_key'];
+                }
+                if(isset($response['games'])) {
+                    $result['games'] = $response['games'];
+                }
+                if(isset($response['message'])) {
+                    $result['message'] = $response['message'];
+                }
+
+                print_r($result);
+
             }
+            //TODO ADD MESSAGES FOR WHEN NO API KEY IS SET
+            break;
+        case "service2":
+            require_once "../views/head.html";
+            require_once "../views/service2.php";
+            require_once "../views/footer.html";
+            break;
+        case "execute_service2": 
+            if(isset($_SESSION['api_key'])) {
+                if(isset($_POST['name'])) {
+                    $url = "localhost/JWT_CA3/JWTServer/index.php?action=service2";
+                    
+                    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+
+                    $result = array(
+                        "games" => null,
+                        "message" => null    
+                    );
+
+                    $data = array(
+                        "api_key" => $_SESSION['api_key'],
+                        "name" => $name
+                    );
+
+                    $response = sendServiceRequest($url, $data);
+                    $response = json_decode($response, true);
+                        
+                    if(isset($response['api_key'])) {
+                            User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
+                            $_SESSION['api_key'] = $response['api_key'];
+                    }
+                    if(isset($response['games'])) {
+                        $result['games'] = $response['games'];
+                    }
+                    if(isset($response['message'])) {
+                        $result['message'] = $response['message'];
+                    }
+
+                    print_r($result);
+                }
+                //TODO ADD MESSAGES FOR WHEN POST VARIABLES NOT SET
+            }
+            //TODO ADD MESSAGES FOR WHEN NO API KEY IS SET
+            break;
+        case "service3":
+            require_once "../views/head.html";
+            require_once "../views/service3.php";
+            require_once "../views/footer.html";
+            break;
+        case "execute_service3": 
+            if(isset($_SESSION['api_key'])) {
+                if(isset($_POST['genre'])) {
+                    $genre = filter_input(INPUT_POST, 'platform', FILTER_SANITIZE_STRING);
+                }
+                if(isset($_POST['platform'])) {
+                    $platform = filter_input(INPUT_POST, 'genre', FILTER_SANITIZE_STRING);
+                }
+                if(!isset($_POST['genre'], $_POST['platform'])) {
+                    $platform = "";
+                    $genre = "";
+                }
+
+                $url = "localhost/JWT_CA3/JWTServer/index.php?action=service3";
+                    
+                $result = array(
+                    "games" => null,
+                    "message" => null    
+                );
+
+                $data = array(
+                    "api_key" => $_SESSION['api_key'],
+                    "platform" => $platform,
+                    "genre" => $genre
+                );
+
+                $response = sendServiceRequest($url, $data);
+                echo $response;
+                // $response = json_decode($response, true);
+                    
+                // if(isset($response['api_key'])) {
+                //         User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
+                //         $_SESSION['api_key'] = $response['api_key'];
+                // }
+                // if(isset($response['games'])) {
+                //     $result['games'] = $response['games'];
+                // }
+                // if(isset($response['message'])) {
+                //     $result['message'] = $response['message'];
+                // }
+
+                // print_r($result);
+                //TODO ADD MESSAGES FOR WHEN POST VARIABLES NOT SET
+            }
+            //TODO ADD MESSAGES FOR WHEN NO API KEY IS SET
             break;
         case "logout":
             session_unset();
             session_destroy();
             header("Location: index.php");
+            break;
         default:
             //TODO Some examples 404 - NotFound, SomeotherCode - Bad Request, and Bad page blablalbla
             echo "<h1>404 NOT FOUND</h1>";
@@ -113,6 +223,12 @@ else {
             require_once "../views/head.html";
             require_once "../views/register_form.php";
             require_once "../views/footer.html";
+            break;
+        case "login":
+            header(User::login($conn, User::class));
+            break;
+        case "register":
+            header(User::register($conn, User::class));
             break;
         //Default switch case presents user with a login form
         default:
