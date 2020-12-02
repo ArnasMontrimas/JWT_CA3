@@ -40,6 +40,7 @@ function handleFreeServiceRequest(Array $token, String $secret, int $created, in
             $timeLeftToWait = (($created - time()) - (24 * 60 * 60));
             $timeLeftToWait = gmdate("H:i", $timeLeftToWait);
             return json_encode(array(
+                "games" => null,
                 "message" => $timeLeftToWait
             ));
         }

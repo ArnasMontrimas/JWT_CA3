@@ -1,20 +1,18 @@
-<div class="container">
-    <nav>
-        <ul>
-            <li>
-                <a href="index.php?action=home">Home</a>
-            </li>
-            <li class="dropdown-parent">
-                <a class="dropdown-toggle" href="#">Services</a>
-                <ul class="dropdown-menu">
-                    <li><a href="index.php?action=service1">Service1</a></li>
-                    <li><a href="index.php?action=service2">Service2</a></li>
-                    <li><a href="index.php?action=service3">Service3</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="index.php?action=logout">Logout</a>
-            </li>
-        </ul>
-    </nav>
-</div>
+<nav class="container mx-auto mt-6 p-6 max-w-3xl text-xl font-bold">
+    <ul class="flex justify-around">
+        <li class="mx-6 flex-1 text-center transition duration-500 ease-in-out rounded-t hover:bg-blue-900 hover:text-white">
+            <a href="index.php?action=home">Home</a>
+        </li>
+        <li class="mx-6 dropdown-parent transition duration-500 ease-in-out rounded-t hover:bg-blue-900 hover:text-white flex-1 text-center">
+            <a class="dropdown-toggle" href="#">Services</a>
+            <ul class="dropdown-menu transition-all text-black duration-300 pt-4 bg-blue-500 rounded">
+                <li class="hover:bg-blue-900 hover:text-white px-2 mb-1"><a href="index.php?action=service1">Free</a></li>
+                <li class="hover:bg-blue-900 hover:text-white px-2 mb-1"><a href="index.php?action=service2">Premium #1</a></li>
+                <li class="hover:bg-blue-900 hover:text-white px-2 mb-4"><a href="index.php?action=service3">Premium #2</a></li>
+            </ul>
+        </li>
+        <li class="mx-6 flex-1 text-center transition duration-500 ease-in-out rounded-t hover:bg-blue-900 hover:text-white">
+            <a href="index.php?action=logout">Logout</a>
+        </li>
+    </ul>
+</nav>

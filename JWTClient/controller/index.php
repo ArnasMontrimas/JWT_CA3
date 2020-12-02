@@ -96,8 +96,8 @@ if(isset($_SESSION['user'])) {
                 $response = json_decode($response, true);
                   
                 if(isset($response['api_key'])) {
-                     User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
-                     $_SESSION['api_key'] = $response['api_key'];
+                    User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
+                    $_SESSION['api_key'] = $response['api_key'];
                 }
                 if(isset($response['games'])) {
                     $result['games'] = $response['games'];
@@ -106,7 +106,7 @@ if(isset($_SESSION['user'])) {
                     $result['message'] = $response['message'];
                 }
 
-                print_r($result);
+                echo json_encode($result);
 
             }
             //TODO ADD MESSAGES FOR WHEN NO API KEY IS SET
@@ -185,21 +185,20 @@ if(isset($_SESSION['user'])) {
                 );
 
                 $response = sendServiceRequest($url, $data);
-                echo $response;
-                // $response = json_decode($response, true);
+                $response = json_decode($response, true);
                     
-                // if(isset($response['api_key'])) {
-                //         User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
-                //         $_SESSION['api_key'] = $response['api_key'];
-                // }
-                // if(isset($response['games'])) {
-                //     $result['games'] = $response['games'];
-                // }
-                // if(isset($response['message'])) {
-                //     $result['message'] = $response['message'];
-                // }
+                if(isset($response['api_key'])) {
+                        User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
+                        $_SESSION['api_key'] = $response['api_key'];
+                }
+                if(isset($response['games'])) {
+                    $result['games'] = $response['games'];
+                }
+                if(isset($response['message'])) {
+                    $result['message'] = $response['message'];
+                }
 
-                // print_r($result);
+                print_r($result);
                 //TODO ADD MESSAGES FOR WHEN POST VARIABLES NOT SET
             }
             //TODO ADD MESSAGES FOR WHEN NO API KEY IS SET

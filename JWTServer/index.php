@@ -33,6 +33,16 @@ switch($action) {
         if(isset($_POST['id'], $_POST['password'], $_POST['membership'])) {
             extract($_POST);
             
+            /**
+             * #1 Make a field in the database "created_at" there you will store time of creation
+             * #2 then somehow let user keep buying time 
+             * (also have frontend when they buy premium show box with a selection of subscriptions 
+             * like 1month, 3month, 6month (dont allow to puchase the same more than 1 time 
+             * but let them go higer until 6months then prevent them for buying more also 
+             * maybe have option to select reccurring buy 
+             * all this could be maybe done with a switch statement i dunno)
+             * also let select 1 minute for testing)
+             */
             $token = array();
             $token['created'] = time();
             $token['id'] = $id;
@@ -96,7 +106,10 @@ switch($action) {
     case "service2":
         if(isset($_POST['api_key'], $_POST['name'])) {
             $api_key = $_POST['api_key'];
-
+            /**
+             * 
+             * 
+             */
             $token = decodeJwt($api_key, $secret);
 
             //Assing user data to separate variables
