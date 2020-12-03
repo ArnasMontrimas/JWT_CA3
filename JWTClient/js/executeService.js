@@ -1,4 +1,4 @@
-const container = document.querySelector("#service1");
+const container = document.querySelector("#service");
 let games = [];
 
 
@@ -44,7 +44,7 @@ let printGamesHtml = (data) => {
 let printMessageHtml = (message) => {
     let hours = message.slice(0, 2);
     let minutes = message.slice(3, 5);
-    container.innerHTML += `
+    container.innerHTML = `
     <div class="w-full text-center">
         <h1 class="text-xl font-medium p-4 text-red-700">
             You have used the service 10 times today
@@ -61,17 +61,74 @@ let printMessageHtml = (message) => {
     `
 }
 
+let printNothingFoundMessageHtml = (message) => {
+    container.innerHTML = `
+    <div class="w-full text-center">
+        <h1 class="text-xl font-medium p-4 text-red-700">
+            ${message}
+        </h1>
+    </div>
+    `
+}
+
+let printRestrictionMessageHtml = (message) => {
+    container.innerHTML = `
+    <div class="w-full text-center">
+        <h1 class="text-xl font-medium p-4 text-red-700">
+            ${message}
+        </h1>
+    </div>
+    `
+}
+
 let executeService1 = () => {
     fetch("index.php?action=execute_service1")
         .then(res => res.json())
         .then(data => {
             if(data['games'] === null) {
+                container.innerHTML = "";
                 printMessageHtml(data['message']);
             }
+            else if(data['games'] === undefined) {
+                //TODO ADD SWITCH STATEMENT HERE BRO WILL MAKE IT LOOK NICER
+                console.log(data['message']);
+            }
             else {
+                container.innerHTML = "";
                 games = data;
                 printGamesHtml(JSON.parse(games['games']));
             }
         })
         .catch(err => console.log(err));
+}
+
+let executeService2 = () => {
+    let name = document.querySelector("input[name='name']").value;
+
+    let formData = new FormData();
+    formData.append("name", name);
+
+    fetch("index.php?action=execute_service2", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data['games'] === null) {
+            printRestrictionMessageHtml("Your subscription has ended please purchase again");
+        }
+        else if(data['games'] === "[]") {
+            //TODO 100% ADD SWTICH STATEMENT HERE BRO WILL MAKE IT LOOK WAYYYY BETTAAAAA
+            printNothingFoundMessageHtml("Nothing was found try again");
+        }
+        else if(data['games'] === undefined) {
+            console.log("You are not authorized!!");
+        }
+        else {
+            container.innerHTML = "";
+            games = data;
+            printGamesHtml(JSON.parse(games['games']));
+        }
+    })
+    .catch(err => console.log(err));
 }

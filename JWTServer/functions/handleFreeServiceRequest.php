@@ -3,16 +3,15 @@
 /**
  * 
  */
-function handleFreeServiceRequest(Array $token, String $secret, int $created, int $user_id, PDO $conn, String $userModel, String $servicesModel) {
-    //First check if 24 hours have passed since token creation
-    if(time() - $created > (24 * 60 * 60)) {
+function handleFreeServiceRequest(Array $token, String $secret, int $validTime, int $user_id, PDO $conn, String $userModel, String $servicesModel) {
+    //First check if current time is greater than end_date of free service which is whatever date they registered plus 1 day
+    if(time() > $validTime) {
         //Reset the count to 0
         if($userModel::updateUsage($user_id, $conn, -($userModel::checkUsage($user_id, $conn)))) {
             //Increment the count by 1
             if($userModel::updateUsage($user_id, $conn)) {
-                //Update Token
-                $token['created'] = time();
-                $updatedJwt = JWT::encode($token, $secret);
+                //Update validTime
+               $userModel::setValidTime($user_id, (time()+(24 * 60 * 60)), $conn);
 
                 //execute query
                 $games = $servicesModel::getAllGames($conn);
@@ -20,7 +19,6 @@ function handleFreeServiceRequest(Array $token, String $secret, int $created, in
                 //Put all data into array
                 $data = array(
                     "games" => $games,
-                    "api_key" => $updatedJwt
                 );
 
                 return json_encode($data);
@@ -37,7 +35,7 @@ function handleFreeServiceRequest(Array $token, String $secret, int $created, in
     else { 
         if($userModel::checkUsage($user_id, $conn) == 10) {
             //Tell the user he has reached his limit and has to wait a certain amount of hours
-            $timeLeftToWait = (($created - time()) - (24 * 60 * 60));
+            $timeLeftToWait = ($validTime - time());
             $timeLeftToWait = gmdate("H:i", $timeLeftToWait);
             return json_encode(array(
                 "games" => null,
@@ -51,7 +49,6 @@ function handleFreeServiceRequest(Array $token, String $secret, int $created, in
                 
                 $data = array(
                     "games" => $games,
-                    "api_key" => null
                 );
 
                 return json_encode($data);

@@ -18,7 +18,7 @@
                 </button>
             </section>
         </div>
-        <section class="w-full overflow-x-auto py-6 webkit-box" id="service1">
+        <section class="w-full overflow-x-auto py-6 webkit-box" id="service">
         </section>
     </main>
 </body>

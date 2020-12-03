@@ -114,12 +114,11 @@ class User {
      * @param PDO $conn database connection object
      * @return bool
      */
-    public static function registerUser(int $id, String $password, String $type, PDO $conn) {        
-        $query = "INSERT INTO users (id, user_id, password, type) VALUES (null, :user_id, :password, :type);";
+    public static function registerUser(int $id, String $type, PDO $conn) {        
+        $query = "INSERT INTO users (id, user_id, type) VALUES (null, :user_id, :type);";
         $statement = $conn->prepare($query);
 
         $statement->bindValue(":user_id", $id);
-        $statement->bindValue(":password", $password);
         $statement->bindValue(":type", $type);
 
         try {
@@ -148,11 +147,53 @@ class User {
         try {
             $statement->execute();
         } catch(PDOException $ex) {
-            echo "Error Occurred: " . $ex->getMessage();
+            echo json_encode("Error Occurred: " . $ex->getMessage());
         }
 
         $data = $statement->fetchColumn();
         return $data;
+    }
+
+    /**
+     * 
+     * 
+     */
+    public static function getValidTime(int $id, PDO $conn) {
+        $query = "SELECT valid_time FROM users WHERE user_id = :id";
+
+        $statement = $conn->prepare($query);
+        $statement->bindValue(":id", $id);
+
+        try {
+            $statement->execute();
+        } catch(PDOException $ex) {
+            echo json_encode("Error occurred: " . $ex->getMessage());
+        }
+
+        $data = $statement->fetchColumn();
+        return $data;
+    }
+
+    /**
+     * 
+     * 
+     */
+    public static function setValidTime(int $id, int $validTime, PDO $conn, bool $add = false) {
+        if($add) $query = "UPDATE users SET valid_time = (valid_time + :validTime) WHERE user_id = :id";
+        else $query = "UPDATE users SET valid_time = :validTime WHERE user_id = :id";
+
+        $statement = $conn->prepare($query);
+        $statement->bindValue(":validTime", $validTime);
+        $statement->bindValue(":id", $id);
+
+        try {
+            $statement->execute();
+        } catch(PDOException $ex) {
+            echo json_encode("Error occurred: " . $ex->getMessage());
+        }
+
+        if($statement->rowCount() == 1) return true;
+        else return false;
     }
 }
 

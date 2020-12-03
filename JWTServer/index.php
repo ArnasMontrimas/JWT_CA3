@@ -30,32 +30,21 @@ $action = isset($_GET['action']) ? $action = filter_input(INPUT_GET, "action", F
 
 switch($action) {
     case "generate_key":
-        if(isset($_POST['id'], $_POST['password'], $_POST['membership'])) {
+        if(isset($_POST['id'], $_POST['membership'])) {
             extract($_POST);
             
-            /**
-             * #1 Make a field in the database "created_at" there you will store time of creation
-             * #2 then somehow let user keep buying time 
-             * (also have frontend when they buy premium show box with a selection of subscriptions 
-             * like 1month, 3month, 6month (dont allow to puchase the same more than 1 time 
-             * but let them go higer until 6months then prevent them for buying more also 
-             * maybe have option to select reccurring buy 
-             * all this could be maybe done with a switch statement i dunno)
-             * also let select 1 minute for testing)
-             */
             $token = array();
-            $token['created'] = time();
             $token['id'] = $id;
-            $token['password'] = $password;
             $token['type'] = $membership;
-            
+
             $jwt = JWT::encode($token, $secret);
             
-            //Reset usage when switched to premium user
-            if($membership == "premium") User::updateUsage($id, $conn, -(User::checkUsage($id, $conn)));
+            //Day & Month Time in unix
+            $day = (24 * 60 * 60);
+            $month = (30 * 24 * 60 * 60);
 
             echo json_encode(
-                decideToSendKey($id, $password, $membership, $conn, User::class, $jwt)
+                decideToSendKey($id, $membership, $conn, User::class, $jwt, $month, $day)
             );
             
         }
@@ -70,9 +59,8 @@ switch($action) {
 
             //Assing user data to separate variables
             $user_id = $token['id'];
-            $password = $token['password'];
             $type = $token['type'];
-            $created = $token['created'];
+            $validTime = User::getValidTime($user_id, $conn);
 
             //Check if the user exists in the servers database
             if(User::checkIfUserExists($user_id, $conn)) {
@@ -80,7 +68,7 @@ switch($action) {
                 if($type == "free") echo handleFreeServiceRequest(
                     $token, 
                     $secret, 
-                    $created, 
+                    $validTime, 
                     $user_id, 
                     $conn, 
                     User::class, 
@@ -89,10 +77,11 @@ switch($action) {
                 elseif($type == "premium") echo handlePremiumServiceRequest(
                     $token,
                     $secret,
-                    $created,
+                    $validTime,
                     $conn,
                     "service1",
-                    GamesServices::class
+                    GamesServices::class,
+                    User::class
                 );
             }
             else echo json_encode(array(
@@ -106,17 +95,13 @@ switch($action) {
     case "service2":
         if(isset($_POST['api_key'], $_POST['name'])) {
             $api_key = $_POST['api_key'];
-            /**
-             * 
-             * 
-             */
+            
             $token = decodeJwt($api_key, $secret);
 
             //Assing user data to separate variables
             $user_id = $token['id'];
-            $password = $token['password'];
             $type = $token['type'];
-            $created = $token['created'];
+            $validTime = User::getValidTime($user_id, $conn);
 
             //Check if the user exists in the servers database
             if(User::checkIfUserExists($user_id, $conn)) {
@@ -128,10 +113,11 @@ switch($action) {
                 if($type == "premium") echo handlePremiumServiceRequest(
                     $token,
                     $secret,
-                    $created,
+                    $validTime,
                     $conn,
                     "service2",
-                    GamesServices::class
+                    GamesServices::class,
+                    User::class
                 );
             }
             else echo json_encode(array(
@@ -150,9 +136,8 @@ switch($action) {
 
             //Assing user data to separate variables
             $user_id = $token['id'];
-            $password = $token['password'];
             $type = $token['type'];
-            $created = $token['created'];
+            $validTime = User::getValidTime($user_id, $conn);
 
             //Check if the user exists in the servers database
             if(User::checkIfUserExists($user_id, $conn)) {
@@ -164,10 +149,11 @@ switch($action) {
                 if($type == "premium") echo handlePremiumServiceRequest(
                     $token,
                     $secret,
-                    $created,
+                    $validTime,
                     $conn,
                     "service3",
-                    GamesServices::class
+                    GamesServices::class,
+                    User::class
                 );
             }
             else echo json_encode(array(

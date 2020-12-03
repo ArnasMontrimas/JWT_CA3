@@ -28,6 +28,9 @@ try {
                 }
             });
         }
+        else {
+            form.submit();
+        }
     }
 } catch (error) {
     console.log("Super secret code, Not for this page!");

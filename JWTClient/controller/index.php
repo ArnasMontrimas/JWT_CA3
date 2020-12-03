@@ -46,7 +46,6 @@ if(isset($_SESSION['user'])) {
                 $membership = filter_input(INPUT_POST, "membership", FILTER_SANITIZE_STRING);
 
                 $data = array(
-                    "password" => $_SESSION['user']['password'],
                     "id" => $_SESSION['user']['id'],
                     "membership" => $membership
                 );
@@ -54,20 +53,26 @@ if(isset($_SESSION['user'])) {
                 $api_key = getApiKey($url, $data);
                 $api_key = json_decode($api_key);
 
-                if(isset($api_key)) {
-                    if(setUserKeyAndType($api_key, $membership, User::class, $conn)) {
+                switch($api_key) {
+                    case "premiumAdded":
+                        $_SESSION['success'] = "You have added 30 Days to your subscription";
                         header("Location: index.php?action=home");
-                    }
-                    else {
-                        $_SESSION['error'] = "Key and membership could not be set";
+                        break;
+                    case "-1":
+                        $_SESSION['error'] = "You cant purchase free package twice";
                         header("Location: index.php?action=home");
-                    }
+                        break;
+                    default:
+                        if(setUserKeyAndType($api_key, $membership, User::class, $conn)) {
+                            $_SESSION['user']['type'] = $_POST['membership'];
+                            $_SESSION['success'] = "Package Changed Successfully";
+                            header("Location: index.php?action=home");
+                        }
+                        else {
+                            $_SESSION['error'] = "Key and membership could not be set";
+                            header("Location: index.php?action=home");
+                        }
                 }
-                else {
-                    $_SESSION['error'] = "Key could not be retrievied";
-                    header("Location: index.php?action=home");
-                }
-                
             }
             else {
                 $_SESSION['error'] = "You must choose a membership type";
@@ -94,11 +99,7 @@ if(isset($_SESSION['user'])) {
 
                 $response = sendServiceRequest($url, $data);
                 $response = json_decode($response, true);
-                  
-                if(isset($response['api_key'])) {
-                    User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
-                    $_SESSION['api_key'] = $response['api_key'];
-                }
+
                 if(isset($response['games'])) {
                     $result['games'] = $response['games'];
                 }
@@ -109,7 +110,11 @@ if(isset($_SESSION['user'])) {
                 echo json_encode($result);
 
             }
-            //TODO ADD MESSAGES FOR WHEN NO API KEY IS SET
+            else {
+                echo json_encode(array(
+                    "message" => "You are not authorized to use this service"
+                ));
+            }
             break;
         case "service2":
             require_once "../views/head.html";
@@ -136,10 +141,7 @@ if(isset($_SESSION['user'])) {
                     $response = sendServiceRequest($url, $data);
                     $response = json_decode($response, true);
                         
-                    if(isset($response['api_key'])) {
-                            User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
-                            $_SESSION['api_key'] = $response['api_key'];
-                    }
+
                     if(isset($response['games'])) {
                         $result['games'] = $response['games'];
                     }
@@ -147,7 +149,7 @@ if(isset($_SESSION['user'])) {
                         $result['message'] = $response['message'];
                     }
 
-                    print_r($result);
+                    echo json_encode($result);
                 }
                 //TODO ADD MESSAGES FOR WHEN POST VARIABLES NOT SET
             }
@@ -187,10 +189,6 @@ if(isset($_SESSION['user'])) {
                 $response = sendServiceRequest($url, $data);
                 $response = json_decode($response, true);
                     
-                if(isset($response['api_key'])) {
-                        User::setUserApiKey($response['api_key'], $conn, $_SESSION['user']['id']);
-                        $_SESSION['api_key'] = $response['api_key'];
-                }
                 if(isset($response['games'])) {
                     $result['games'] = $response['games'];
                 }
@@ -198,7 +196,7 @@ if(isset($_SESSION['user'])) {
                     $result['message'] = $response['message'];
                 }
 
-                print_r($result);
+                echo json_encode($result);
                 //TODO ADD MESSAGES FOR WHEN POST VARIABLES NOT SET
             }
             //TODO ADD MESSAGES FOR WHEN NO API KEY IS SET
