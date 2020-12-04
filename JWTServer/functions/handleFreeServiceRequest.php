@@ -11,34 +11,56 @@
  * @param String $servicesModel gamesServices class
  * @return JSON
  */
-function handleFreeServiceRequest(Array $token, String $secret, int $validTime, int $user_id, PDO $conn, String $userModel, String $servicesModel) {
+function handleFreeServiceRequest(Array $token, String $secret, int $validTime, int $user_id, PDO $conn, String $userModel, String $servicesModel) {    
     //First check if current time is greater than end_date of free service which is whatever date they registered plus 1 day
     if(time() > $validTime) {
-        //Reset the count to 0
-        if($userModel::updateUsage($user_id, $conn, -($userModel::checkUsage($user_id, $conn)))) {
-            //Increment the count by 1
-            if($userModel::updateUsage($user_id, $conn)) {
-                //Update validTime
-               $userModel::setValidTime($user_id, (time()+(24 * 60 * 60)), $conn);
+        if($userModel::checkUsage($user_id, $conn) != 0) {
+            //Reset the count to 0
+            if($userModel::updateUsage($user_id, $conn, -($userModel::checkUsage($user_id, $conn)))) {
+                //Increment the count by 1
+                if($userModel::updateUsage($user_id, $conn)) {
+                    //Update validTime
+                    $userModel::setValidTime($user_id, (time()+(24 * 60 * 60)), $conn);
 
-                //execute query
-                $games = $servicesModel::getAllGames($conn);
+                    //execute query
+                    $games = $servicesModel::getAllGames($conn);
 
-                //Put all data into array
-                $data = array(
-                    "games" => $games,
-                );
+                    //Put all data into array
+                    $data = array(
+                        "games" => $games,
+                    );
 
-                return json_encode($data);
+                    return json_encode($data);
+                }
+                else return json_encode(array(
+                    "message" => "Something went wrong1"
+                ));
+                
             }
             else return json_encode(array(
-                "message" => "Something went wrong"
+                "message" => "Something went wrong2"
             ));
-            
         }
-        else return json_encode(array(
-            "message" => "Something went wrong"
-        ));
+        else {
+            //Increment the count by 1
+            if($userModel::updateUsage($user_id, $conn)) {
+            //Update validTime
+            $userModel::setValidTime($user_id, (time()+(24 * 60 * 60)), $conn);
+
+            //execute query
+            $games = $servicesModel::getAllGames($conn);
+
+            //Put all data into array
+            $data = array(
+                "games" => $games,
+            );
+
+            return json_encode($data);
+            }
+            else return json_encode(array(
+                "message" => "Something went wrong1"
+            ));
+        }
     }
     else { 
         if($userModel::checkUsage($user_id, $conn) == 10) {
@@ -63,7 +85,7 @@ function handleFreeServiceRequest(Array $token, String $secret, int $validTime, 
             }
             else {
                 return json_encode(array(
-                    "message" => "Something went wrong"
+                    "message" => "Something went wrong3"
                 ));
             }
 

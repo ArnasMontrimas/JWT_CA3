@@ -15,7 +15,10 @@ function decideToSendKey(int $id, String $membership, PDO $conn, String $model, 
     if($model::checkIfUserExists($id, $conn)) {
         if($model::checkUserType($id, $conn) == $membership) {
             if($membership == "premium") {
-                //Set end date to current time plus 30 days
+                if($model::checkUsage($id, $conn) != 0) {
+                    $model::updateUsage($id, $conn, -$model::checkUsage($id, $conn));
+                }
+                //Add 30 days to his subscription
                 if($model::setValidTime($id, $month, $conn, true)) {
                     $validTime = $model::getValidTime($id, $conn);
                 }
