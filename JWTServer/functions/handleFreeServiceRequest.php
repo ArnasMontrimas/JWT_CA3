@@ -1,7 +1,15 @@
 <?php
 
 /**
- * 
+ * This function will handle free user service requests it will limit users requests to 10 per day and reset valid time if 24 hours passed since his last valid time
+ * @param Array $token jwt token used as api key
+ * @param String $secret token secret
+ * @param int $validTime users valid time to use service
+ * @param int $user_id users id number
+ * @param PDO $conn database connection object
+ * @param String $userModel the user class
+ * @param String $servicesModel gamesServices class
+ * @return JSON
  */
 function handleFreeServiceRequest(Array $token, String $secret, int $validTime, int $user_id, PDO $conn, String $userModel, String $servicesModel) {
     //First check if current time is greater than end_date of free service which is whatever date they registered plus 1 day

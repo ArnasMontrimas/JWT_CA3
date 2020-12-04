@@ -1,6 +1,11 @@
 <?php
 
-//Helper function 
+/**
+ * Helper function to send request to server from client
+ * @param String $url the url to which the request will be sent
+ * @param Array $payload the data we send with the request
+ * @return String the response
+ */
 function sendServiceRequest(String $url, Array $payload) {
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_POST, true);

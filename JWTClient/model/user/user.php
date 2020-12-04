@@ -1,11 +1,15 @@
 <?php
 
 /**
- * 
+ * The user class
  */
 class User {
     /**
-     * 
+     * This function will check if a user exists and if he dose he will be loggedin
+     * @param PDO $conn database connection object
+     * @param String $model the user class
+     * @throws PDOException $ex
+     * @return String url to which send the user to
      */
     public static function login(PDO $conn, String $model) {
         $location = null;
@@ -75,7 +79,11 @@ class User {
         return $location;
     }
     /**
-     * 
+     * This function will register the user on the client
+     * @param PDO $conn database connection object
+     * @param String $model the user class
+     * @throws PDOException $ex
+     * @return String url to which send the user to
      */
     public static function register(PDO $conn, String $model) {
         $location = null;
@@ -147,7 +155,11 @@ class User {
         return $location;
     }
     /**
-     * 
+     * This function will check if a user email is unique if its not registration will not be allowed
+     * @param String $email users email address
+     * @param PDO $conn
+     * @throws PDOException $ex
+     * @return bool
      */
     public static function checkIfEmailUnique(String $email, PDO $conn) {
         $query = "SELECT COUNT(email) FROM users WHERE email = :email";
@@ -165,7 +177,11 @@ class User {
         else return true; 
     }
     /**
-     * 
+     * This function will get the users api key
+     * @param PDO $conn database connection object
+     * @param int $id users id number
+     * @throws PDOException $ex
+     * @return String/false
      */
     public static function getUserApiKey(PDO $conn, int $id) {
         $query = "SELECT api_key FROM users WHERE id = :id";
@@ -184,7 +200,12 @@ class User {
         return $data;
     }
     /**
-     * 
+     * This function will return ann assoc array which will contain the user id and type we can do this using email since it is unique to each user and password for extra assurance
+     * @param PDO $conn database connection object
+     * @param String $email users email address
+     * @param String $password users password
+     * @throws PDOException $ex
+     * @return Array/false/null
      */
     public static function getUserIdAndType(PDO $conn, String $email, String $password) {
         $query = "SELECT id, membership FROM users WHERE email = :email AND password = :password;";
@@ -194,14 +215,23 @@ class User {
         $stm->bindValue(":email", $email);
         $stm->bindValue(":password", $password);
         
-        $stm->execute();
+        try {
+            $stm->execute();
+        } catch(PDOException $ex) {
+            return false;
+        }
         
         $data = $stm->fetch(PDO::FETCH_ASSOC);
     
         return $data;
     }
     /**
-     * 
+     * This function will set the users api key
+     * @param String $api_key the key to be set
+     * @param PDO $conn database connection object
+     * @param int $id users id number
+     * @throws PDOException $ex
+     * @return bool
      */
     public static function setUserApiKey(String $api_key, PDO $conn, int $id) {
         $query = "UPDATE users SET api_key = :api_key WHERE id = :id;";
@@ -221,7 +251,12 @@ class User {
         else return false;
     }
     /**
-     * 
+     * This function will update the users type(membership)
+     * @param int $id users id number
+     * @param String $mebership users membership type
+     * @param PDO $conn database connection object
+     * @throws PDOException $ex
+     * @return bool
      */
     public static function updateUserType(int $id, String $mebership, PDO $conn) {
         $query = "UPDATE users SET membership = :membership WHERE id = :id";

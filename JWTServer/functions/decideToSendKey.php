@@ -1,5 +1,6 @@
 <?php
 
+//Require extra function to handle assignment of valid time to users
 require_once "functions/handleServiceValidTime.php";
 
 /**

@@ -9,6 +9,7 @@ try {
     let radios = document.querySelectorAll("input[name='membership']");    
     let form = document.querySelector("#packageForm");
 
+    //Add event listener on submit button prevent default action if free package is selected
     submitBtn.addEventListener("click", (e) => {
         radios.forEach(r => {
             if(r.value === "free" && r.checked) {
@@ -17,6 +18,10 @@ try {
         })
     });
 
+    /**
+     * This function will check what membership type the user is and show alert if user is premium and is switching to free user
+     * @param {JSON} membership json objet
+     */
     showAlert = (membership) => {
         if(membership.value === "premium") {
             radios.forEach(r => {

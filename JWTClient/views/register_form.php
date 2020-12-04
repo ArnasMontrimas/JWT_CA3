@@ -5,16 +5,10 @@
                 <header class="text-center text-2xl font-medium mb-6 p-5">
                     <h1>Registration Form</h1>
                 </header>
-                <!-- 
-                    Display any present errors
-                -->
                 <?php if(isset($_SESSION['error'])) { ?> 
                     <div class="text-lg text-red-900 font-bold">
                         <h4><?php echo $_SESSION['error'] ?></h4>
                     </div>
-                    <!-- 
-                        Remove error after its displayed this prevents the error from being displayed again when page is refreshed
-                    -->
                     <?php unset($_SESSION['error']); ?>
                 <?php }; ?>
                 <form action="index.php?action=register" method="POST" class="sm:w-80">

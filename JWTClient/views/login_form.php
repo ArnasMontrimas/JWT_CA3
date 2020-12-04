@@ -4,17 +4,17 @@
             <div class="h-screen-80 flex flex-col justify-center items-center">
                 <header class="text-center text-2xl font-medium mb-6 p-5">
                     <h1>Welcome Please Login</h1>
+                    <div class="mt-2">
+                        <h5 class="text-base">Demo Account</h5>
+                        <span class="text-base">Email: test@test.com</span>
+                        <span class="text-base">|</span>
+                        <span class="text-base">Password: test</span>
+                    </div>
                 </header>
-                <!-- 
-                    Display any present errors
-                -->
                 <?php if(isset($_SESSION['error'])) { ?> 
                     <div class="text-lg text-red-900 font-bold">
                         <h4><?php echo $_SESSION['error'] ?></h4>
                     </div>
-                    <!-- 
-                        Remove eorro after its displayed this prevents the error from being displayed again when page is refreshed
-                    -->
                     <?php unset($_SESSION['error']); ?>
                 <?php }; ?>
                 <form action="index.php?action=login" method="POST" class="sm:w-80">

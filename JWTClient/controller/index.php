@@ -3,7 +3,7 @@
 //Reqiure the Database class
 require_once "../model/database.php";
 
-//Reqiure a CURL request function
+//Reqiure a CURL request functions
 require_once "../model/curl/getApiKey.php";
 require_once "../model/curl/sendServiceRequest.php";
 
@@ -33,7 +33,6 @@ if(isset($_SESSION['user'])) {
 
     //Handle logedin users requests
     switch($action) {
-        //Home page for a logedin user
         case "home":
             require_once "../views/head.html";
             require_once "../views/home.php";
@@ -45,14 +44,17 @@ if(isset($_SESSION['user'])) {
 
                 $membership = filter_input(INPUT_POST, "membership", FILTER_SANITIZE_STRING);
 
+                //Data we will send to the server to make our token
                 $data = array(
                     "id" => $_SESSION['user']['id'],
                     "membership" => $membership
                 );
                 
+                //Send request and decode response
                 $api_key = getApiKey($url, $data);
                 $api_key = json_decode($api_key);
 
+                //Handle different types of responses
                 switch($api_key) {
                     case "premiumAdded":
                         $_SESSION['success'] = "You have added 30 Days to your subscription";
@@ -88,18 +90,22 @@ if(isset($_SESSION['user'])) {
             if(isset($_SESSION['api_key'])) {
                 $url = "localhost/JWT_CA3/JWTServer/index.php?action=service1";
                 
+                //Here we will store our response
                 $result = array(
                     "games" => null,
                     "message" => null    
                 );
 
+                //Data we send to the server
                 $data = array(
                     "api_key" => $_SESSION['api_key']
                 );
 
+                //Send request and decode response
                 $response = sendServiceRequest($url, $data);
                 $response = json_decode($response, true);
 
+                //Set result array based on the response
                 if(isset($response['games'])) {
                     $result['games'] = $response['games'];
                 }
@@ -128,20 +134,23 @@ if(isset($_SESSION['user'])) {
                     
                     $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
 
+                    //Here we will store response
                     $result = array(
                         "games" => null,
                         "message" => null    
                     );
 
+                    //Data we send to the server
                     $data = array(
                         "api_key" => $_SESSION['api_key'],
                         "name" => $name
                     );
-
+            
+                    //Send request and decode response
                     $response = sendServiceRequest($url, $data);
                     $response = json_decode($response, true);
                         
-
+                    //Set result array based on the response
                     if(isset($response['games'])) {
                         $result['games'] = $response['games'];
                     }
@@ -151,9 +160,13 @@ if(isset($_SESSION['user'])) {
 
                     echo json_encode($result);
                 }
-                //TODO ADD MESSAGES FOR WHEN POST VARIABLES NOT SET
+                else echo json_encode(array(
+                    "message" => "You must enter a game name or leave it blank"
+                ));
             }
-            //TODO ADD MESSAGES FOR WHEN NO API KEY IS SET
+            else echo json_encode(array(
+                "message" => "You are not authorized to use this service"
+            ));
             break;
         case "service3":
             require_once "../views/head.html";
@@ -174,21 +187,25 @@ if(isset($_SESSION['user'])) {
                 }
 
                 $url = "localhost/JWT_CA3/JWTServer/index.php?action=service3";
-                    
+                
+                //Here we will store response
                 $result = array(
                     "games" => null,
                     "message" => null    
                 );
 
+                //Data we send to the server
                 $data = array(
                     "api_key" => $_SESSION['api_key'],
                     "platform" => $platform,
                     "genre" => $genre
                 );
 
+                //Send request and deocde response
                 $response = sendServiceRequest($url, $data);
                 $response = json_decode($response, true);
                     
+                //Set result array based on the response
                 if(isset($response['games'])) {
                     $result['games'] = $response['games'];
                 }
@@ -197,9 +214,10 @@ if(isset($_SESSION['user'])) {
                 }
 
                 echo json_encode($result);
-                //TODO ADD MESSAGES FOR WHEN POST VARIABLES NOT SET
             }
-            //TODO ADD MESSAGES FOR WHEN NO API KEY IS SET
+            else echo json_encode(array(
+                "message" => "You are not authorized to use this service"
+            ));
             break;
         case "logout":
             session_unset();
@@ -207,15 +225,14 @@ if(isset($_SESSION['user'])) {
             header("Location: index.php");
             break;
         default:
-            //TODO Some examples 404 - NotFound, SomeotherCode - Bad Request, and Bad page blablalbla
-            echo "<h1>404 NOT FOUND</h1>";
+            //If the action is not found just redirect to home page
+            header("Location: index.php?action=home");
     }
 
 }
 else {
-    //Handle a not logein users requests
+    //Handle a non logged in users requests
     switch($action) {
-        //Here the user is presented with the registration form
         case "register_form":
             require_once "../views/head.html";
             require_once "../views/register_form.php";
@@ -227,7 +244,7 @@ else {
         case "register":
             header(User::register($conn, User::class));
             break;
-        //Default switch case presents user with a login form
+        //If no action provided or no action found display login form page
         default:
             require_once "../views/head.html";
             require_once "../views/login_form.php";

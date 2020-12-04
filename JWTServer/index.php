@@ -51,7 +51,6 @@ switch($action) {
         else echo json_encode("Data was not set");
         break;
     case "service1":
-        //First check if the api_key was sent with the request
         if(isset($_POST['api_key'])) {
             $api_key = $_POST['api_key'];
 

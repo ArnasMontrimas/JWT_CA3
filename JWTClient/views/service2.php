@@ -11,16 +11,21 @@
                     <span class="text-center w-full block text-lg p-1 italic text-gray-500">Search Games By Name</span>
                 </h1>
                 <div class="p-1 mb-4 text-center">
-                    <ul class="flex justify-around">
-                        <li class="py-1 italic text-gray-500 text-medium">
-                            Bloodborne
-                        </li>
-                        <li class="py-1 italic text-gray-500 text-medium">
-                            Cuphead
-                        </li>
-                        <li class="py-1 italic text-gray-500 text-medium">
-                            Titanfall
-                        </li>
+                    <ul class="flex flex-col items-around">
+                        <div>
+                            <span class="font-medium">Game Names</span>
+                        </div>
+                        <div class="flex justify-around">
+                            <li class="py-1 italic text-gray-500 text-medium">
+                                Bloodborne
+                            </li>
+                            <li class="py-1 italic text-gray-500 text-medium">
+                                Cuphead
+                            </li>
+                            <li class="py-1 italic text-gray-500 text-medium">
+                                Titanfall
+                            </li>
+                        </div>
                     </ul>
                 </div>
             </header>

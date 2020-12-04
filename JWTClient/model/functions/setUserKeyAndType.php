@@ -1,7 +1,12 @@
 <?php
 
 /**
- * 
+ * This function set the user api_key and type when they switch packages
+ * @param String $api_key user api key
+ * @param String $membership users membership type
+ * @param String $model the user class
+ * @param PDO $conn database connection object
+ * @return bool
  */
 function setUserKeyAndType(String $api_key, String $membership, String $model, PDO $conn) {
     $_SESSION['api_key'] = $api_key;

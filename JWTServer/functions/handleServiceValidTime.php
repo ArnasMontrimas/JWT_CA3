@@ -1,8 +1,13 @@
 <?php
 
 /**
- *
- *
+ * This function will assing valid time to users based on their user type(membership)
+ * @param String $membership users membership type
+ * @param int $id users id number
+ * @param int $day 1 day representaion in unix timecode
+ * @param int $month 1 month representation in unix timecode
+ * @param PDO $conn database connection object
+ * @param String $model the user class
  */
 function handleServiceValidTime(String $membership, int $id, int $day, int $month, PDO $conn, String $model) {
     if($membership == "premium") {

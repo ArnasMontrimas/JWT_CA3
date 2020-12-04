@@ -1,7 +1,11 @@
 <?php
 
 /**
- * 
+ * This function will decode the jwt token and catch any errors it also type casts token to array
+ * @param String $api_key
+ * @param String $secret
+ * @throws UnexpectedValueException/DomainException 
+ * @return Array
  */
 function decodeJwt(String $api_key, String $secret) {
     try {

@@ -1,7 +1,14 @@
 <?php
 
 /**
- * 
+ * This function will handle premium users requests to use services it will block his request if his valid time has eneded
+ * @param Array $token jwt token used as api key
+ * @param String $secret token secret
+ * @param int $validTime users valid time to use service
+ * @param PDO $conn database connection object
+ * @param String $userModel the user class
+ * @param String $servicesModel gamesServices class
+ * @return JSON
  */
 function handlePremiumServiceRequest(Array $token, String $secret, int $validTime, PDO $conn, String $service, String $servicesModel, String $userModel) {
     if($service == "service2") {

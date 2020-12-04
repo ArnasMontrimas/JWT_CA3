@@ -7,6 +7,7 @@ class GamesServices {
     /**
      * This method gets all games from the database
      * @param PDO $conn database connection object
+     * @throws PDOException $ex
      * @return String|null
      */
     public static function getAllGames(PDO $conn) {
@@ -17,8 +18,9 @@ class GamesServices {
         try {
             $statement->execute();
         } catch (PDOException $ex) {
-            echo "Error occurred: " . $ex->getMessage();
-            die();
+            echo json_encode(array(
+                "message" => "Error occurred: " . $ex->getMessage() 
+            ));
         }
         $games = $statement->fetchAll(PDO::FETCH_ASSOC);
         return json_encode($games);
@@ -27,6 +29,7 @@ class GamesServices {
     /**
      * This method searches for a game by name and returns the game if found
      * @param PDO $conn database connection object
+     * @throws PDOException $ex
      * @return String|null
      */
     public static function getGamesByName(String $name, PDO $conn) {
@@ -38,8 +41,9 @@ class GamesServices {
         try {
             $statement->execute();
         } catch(PDOException $ex) {
-            echo "Error occurred: " . $ex->getMessage();
-            die();
+            echo json_encode(array(
+                "message" => "Error occurred: " . $ex->getMessage() 
+            ));
         }
         $games = $statement->fetchAll(PDO::FETCH_ASSOC);
         return json_encode($games);
@@ -50,6 +54,7 @@ class GamesServices {
      * @param String $platform the platform of the game
      * @param String $genre the genre of the game
      * @param PDO $conn database connection object
+     * @throws PDOException $ex
      * @return String|null
      */
     public static function getGamesByPlatformAndGenre(String $platform, String $genre, PDO $conn) {
@@ -68,8 +73,9 @@ class GamesServices {
         try {
             $statement->execute();
         } catch(PDOException $ex) {
-            echo "Error occurred: " . $ex->getMessage();
-            die();
+            echo json_encode(array(
+                "message" => "Error occurred: " . $ex->getMessage() 
+            ));
         }
         $games = $statement->fetchAll(PDO::FETCH_ASSOC);
         return json_encode($games);
