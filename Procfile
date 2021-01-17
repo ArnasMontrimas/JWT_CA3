@@ -1,1 +1,1 @@
-web: heroku-php-apache2 ./JWTClient/controller
+web: vendor/bin/heroku-php-apache2 JWTClient/controller/
